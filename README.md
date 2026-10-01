@@ -17,6 +17,8 @@ El proyecto incluye una **extensión propia** (`presentation-menu.js`) que añad
 6. **Zoom solo de la página.** `Ctrl/Cmd + rueda` sobre el contenido agranda/achica únicamente la página (el menú mantiene su tamaño). `Ctrl/Cmd + 0` reinicia.
 7. **Ancho del menú ajustable.** Arrastrando el divisor del borde derecho del menú.
 8. **Corrector ortográfico.** Fuerza el corrector en el editor y permite fijar el idioma (por defecto, el del documento).
+9. **Página activa resaltada.** El ítem de la página actual se marca con la clase `fwpm-active` (enlace + fondo), de modo que siga siendo visible al navegar.
+10. **Numeración de encabezados.** Cada `h2`–`h6` del contenido recibe su número de jerarquía (`4.5`, `4.5.1`, `4.5.1.1`…) como atributo `data-num`, que el CSS dibuja en la canaleta de la izquierda. Desactivable con `numberHeadings: false`.
 
 ### Extensiones de la comunidad incluidas
 | Extensión | Función |
@@ -34,9 +36,17 @@ El proyecto incluye una **extensión propia** (`presentation-menu.js`) que añad
 
 ```
 Feather-Wiki-Presentation/
-├─ index.html                     # Wiki (46 páginas)
+├─ index.html                     # Wiki (46 páginas) + tema "Trazabilidad"
+├─ favicon.ico                    # Icono de Feather Wiki (autoalojado)
 ├─ README.md
 └─ extensions/
+   ├─ fonts/                      # Fuentes WOFF2 autoalojadas (OFL)
+   │  ├─ archivo-latin.woff2
+   │  ├─ ibm-plex-sans-latin.woff2
+   │  ├─ ibm-plex-mono-400-latin.woff2
+   │  ├─ ibm-plex-mono-500-latin.woff2
+   │  ├─ manifest.json            # Qué familia, pesos, bytes y licencia
+   │  └─ OFL.txt                  # Licencia de las tres familias
    └─ v1.9.x/
       ├─ presentation-menu.js     # Extensión propia
       ├─ feather-search.js
@@ -65,8 +75,45 @@ Cada archivo `.html` es una wiki independiente y **autocontenida** (HTML + CSS +
 | SunEditor (JS) | `extensions/v1.9.x/suneditor/suneditor.min.js` |
 | SunEditor (CSS) | `extensions/v1.9.x/suneditor/suneditor.min.css` |
 | Navegación anterior/siguiente | `extensions/v1.9.x/simple-navigation.js` |
+| Archivo (display) | `extensions/fonts/archivo-latin.woff2` |
+| IBM Plex Sans (cuerpo) | `extensions/fonts/ibm-plex-sans-latin.woff2` |
+| IBM Plex Mono (código/números) | `extensions/fonts/ibm-plex-mono-400-latin.woff2`, `…-500-latin.woff2` |
 
 > El feed de "Updates" que se cargaba desde `floss.social` fue **eliminado** (era la única llamada de red restante).
+
+**Imágenes.** Las 14 fotografías de contenido venían apuntando a `upload.wikimedia.org` y **se descargaban de internet**. Se descargaron una vez y se **incrustaron en base64** dentro del JSON de `index.html` (mismo modelo que usa Feather Wiki para sus imágenes), así que ya no hay ninguna petición de red. Se conservan intactos los enlaces de atribución (`href`) a la fuente original en Wikimedia Commons.
+
+Las fuentes se sirven con `@font-face` desde `./extensions/fonts/` y **cargan igual con doble clic (`file://`)** que servidas por HTTP; no se necesita ningún CDN. `favicon.ico` (referenciado por el contenido como "Feather Wiki icon") está en la raíz junto a `index.html`.
+
+---
+
+## Diseño: tema "Trazabilidad"
+
+El aspecto visual está aplicado en **`index.html` → Wiki Settings → Custom CSS** (`<style id="c">`). No hay CSS externo: el tema viaja dentro del propio archivo.
+
+La idea es una **hoja impresa sobre un escritorio de taller**: fondo de cromo gris, documento blanco con borde derecho, y una **canaleta de numeración** con un filete vertical que conecta cada encabezado con su número.
+
+| Elemento | Decisión |
+|---|---|
+| Superficies | `#FFFFFF` hoja · `#E9ECF1` cromo (menú + fondo) · `#1A1F26` campos en oscuro |
+| Tinta | `#14171C` texto · `#5C6470` metadatos y numeración · `#D4D9E0` filetes |
+| Acento | `#1F5598` azul de plano técnico (enlaces, botones, foco) |
+| Display | **Archivo** 600/700 para títulos y encabezados |
+| Cuerpo | **IBM Plex Sans** 400/600 |
+| Mono | **IBM Plex Mono** 400/500 para código, metadatos y la numeración de la canaleta |
+| Medida | Columna de lectura de **600 px** (~75 caracteres por línea); la hoja mide 800 px y queda centrada respecto al texto |
+| Cabecera | Título apilado sobre una sola línea de metadatos (la tabla de dos columnas de Feather Wiki se deshace con `!important`) |
+| Numeración | `main > section[data-num]` → canaleta de `4.5rem` con filete en `--rail`; los números se alinean a la derecha contra el filete |
+| Página activa | `.fwpm-active` en el menú (enlace azul + subrayado + fondo tenue) |
+| Ancho | En modo presentación (menú oculto) la hoja se expande a todo el ancho |
+
+### Cómo cambiar el tema
+
+1. **Wiki Settings → Custom CSS**: ediciones puntuales (colores, tamaños, medida).
+2. `:root` dentro de ese mismo bloque: los tokens `--bg`, `--sb-bg`, `--color`, `--link`, `--font`, `--gutter`… Cambiar un token reestiliza todo el sistema.
+3. La numeración de la canaleta y el resaltado de la página activa los produce `presentation-menu.js` (atributo `data-num` y clase `fwpm-active`); si los desactivas con `numberHeadings: false` / `activeLink: false`, el CSS simplemente no encuentra nada que dibujar.
+
+> **Importante:** el tema vive en el `<style id="c">` del `index.html`. Si editas con una pestaña **ya abierta** y guardas, la app regenera el `<head>` con el Custom Head que tenía cargado. Recarga con `Ctrl+F5` antes de editar.
 
 ---
 
@@ -112,6 +159,8 @@ const FWPM = {
   sidebarToggle: true,        // ocultar/mostrar el menú
   pageZoom: true,             // zoom solo de la página (Ctrl/Cmd + rueda)
   resizeMenu: true,           // redimensionar el menú con el mouse
+  numberHeadings: true,       // numerar encabezados (data-num en la canaleta)
+  activeLink: true,           // resaltar la página actual en el menú
   zoomStep: 0.1,
   pageZoomMin: 0.5,
   pageZoomMax: 3,
@@ -133,8 +182,17 @@ const FWPM = {
   - usaba `state.edits.useMd`, que no existe en Feather Wiki 1.9.x → corregido;
   - ahora carga desde `extensions/v1.9.x/suneditor/` (antes lo hacía desde el CDN de jsDelivr).
 - **`toggle-menu.js` y `auto-save.js`** están descargadas pero no activadas: la primera duplica/choca con la función de ocultar menú; la segunda solo tiene sentido con guardado en servidor (*nest*).
-- Los archivos pueden pesar varios MB si contienen imágenes (se guardan incrustadas en base64).
-- **Totalmente offline**: verificado bloqueando el acceso a internet; no se produce ninguna petición externa.
+- Los archivos pueden pesar varios MB si contienen imágenes (se guardan incrustadas en base64). Este `index.html` pesa ~690 KB: los datos de las 46 páginas (~300 KB), el tema (~13 KB) y las 14 fotos incrustadas en base64 (~390 KB).
+- **Totalmente offline**: verificado recorriendo las **47 páginas del menú** en Chrome y registrando todas las peticiones de red — **0 peticiones externas**, 0 fallos de carga y 0 errores de JS. Lo mismo se repitió abriendo el archivo con `file://` (doble clic): las 4 fuentes WOFF2 cargan y las imágenes se muestran.
+
+### Verificación offline (cómo se comprobó)
+```
+1. Abrir index.html en Chrome con depuración remota y registrar Network.requestWillBeSent.
+2. Navegar a las 47 páginas del menú.
+3. Filtrar peticiones cuya URL no sea http://localhost — debe dar 0.
+4. Comprobar en el DOM que ningún <img>, <video>, <iframe> u hoja de estilo apunta a un origen externo.
+5. Repetir el paso 1-3 con file:///.../index.html (doble clic, sin servidor).
+```
 
 ### Seguridad
 - El antiguo Custom JS incluía un **token de acceso de Mastodon** incrustado y hacía `fetch` a `floss.social`. Fue **eliminado** del archivo.
@@ -150,4 +208,7 @@ El archivo contiene **todos los datos de la wiki incrustados** en un bloque `<sc
 - **[Feather Wiki](https://feather.wiki)** por Robbie Antenesse — licencia **AGPLv3**.
 - **Extensiones de la comunidad**: `feather-search`, `data-import-export` (oficiales de Feather Wiki); `suneditor-replacement` por *jcoder* (adaptación); `simple-navigation` (oficial).
 - **`presentation-menu.js`**: extensión propia de este proyecto.
+- **Tipografías** (subconjuntos *latin*, sin modificar, licencia **SIL Open Font License 1.1**; texto completo en `extensions/fonts/OFL.txt`):
+  - **Archivo** — Omnibus-Type, Copyright 2020 The Archivo Project Authors.
+  - **IBM Plex Sans** y **IBM Plex Mono** — IBM, Copyright 2017 IBM Corp. con Reserved Font Name "Plex".
 - El **contenido** de la wiki (páginas, textos, imágenes) pertenece a su autor.

@@ -11,6 +11,9 @@
  * 6. Zooms only the page content (Ctrl/Cmd + wheel over the page, Ctrl/Cmd + 0
  *    to reset). The menu keeps its size.
  * 7. Drag the divider to change the menu width.
+ * 8. Marks the page you are on in the menu, and gives every heading on the page
+ *    its place in the same numbering (4.5, 4.5.1, 4.5.1.1), exposed as a
+ *    data-num attribute so the theme can draw it in the margin.
  *
  * The menu hierarchy and order are stored in Feather Wiki's own page data
  * (the "parent" field and the order of the pages array), so moving a page marks
@@ -26,6 +29,8 @@
     numberPages: true,          // 2. number the page menu
     separator: ' ',             // text between the number and the title (e.g. '. ')
     numberAllPages: false,      // also number the "All Pages" listing
+    numberHeadings: true,       // 2b. number the headings on the page (4.5.1, 4.5.1.1...)
+    activeLink: true,           // 2c. highlight the page you are on in the menu
     moveControls: true,         // 3. buttons to move the current page in the menu
     clarifyEditorButtons: true, // 4. show "1." instead of "#" for numbered lists
     editorSizes: true,          // 4b. add H1..H6 buttons to the visual editor
@@ -74,6 +79,8 @@
           if (FWPM.editorSizes) addEditorSizeButtons();
           if (FWPM.editorSpellcheck) setupEditorSpellcheck();
           if (FWPM.moveControls) addMoveControls();
+          if (FWPM.activeLink) markActiveLink();
+          if (FWPM.numberHeadings) numberHeadings();
           if (FWPM.sidebarToggle) setupSidebarToggle();
           ensureBaseWidth();
           if (FWPM.resizeMenu) setupResizer();
@@ -205,6 +212,72 @@
       var rootUl = section.querySelector('ul');
       if (!rootUl) return;
       numberList(rootUl, '');
+    }
+
+    // --- Numbering of the page itself -------------------------------------
+
+    // Slug of the page that is open right now, or null for views (All Pages,
+    // Wiki Settings) that are not part of the menu.
+    function currentSlug () {
+      if (!state.pg || state.pg.id === undefined) return null;
+      return state.pg.slug || null;
+    }
+
+    // Mark the link of the open page so the theme can highlight it.
+    function markActiveLink () {
+      var nav = document.querySelector('.sb nav');
+      if (!nav) return;
+      var old = nav.querySelectorAll('.fwpm-active');
+      for (var i = 0; i < old.length; i++) old[i].classList.remove('fwpm-active');
+      var slug = currentSlug();
+      if (!slug) return;
+      var links = nav.querySelectorAll('a[href^="?page="]');
+      for (var k = 0; k < links.length; k++) {
+        var href = links[k].getAttribute('href') || '';
+        if (decodeURIComponent(href.slice(6)) === slug) {
+          links[k].classList.add('fwpm-active');
+          return;
+        }
+      }
+    }
+
+    // Give the page title its menu number (4.5) and every heading below it its
+    // own place in the same numbering (4.5.1, 4.5.1.1). The values are written
+    // to data-num, which is what the theme draws in the margin.
+    function numberHeadings () {
+      var section = document.querySelector('main > section');
+      if (!section) return;
+      section.removeAttribute('data-num');
+      var stamped = section.querySelectorAll('[data-num]');
+      for (var i = 0; i < stamped.length; i++) stamped[i].removeAttribute('data-num');
+      if (state.edit) return;
+      var pg = state.pg;
+      if (!pg || pg.e || pg.id === undefined) return;
+      var base = numberFor(pg);
+      if (!/^\d+(\.\d+)*$/.test(base)) return;
+
+      section.setAttribute('data-num', base);
+      var title = section.querySelector('header h1');
+      if (title) title.setAttribute('data-num', base);
+
+      var uc = section.querySelector('.uc');
+      if (!uc) return;
+      var c2 = 0, c3 = 0, c4 = 0;
+      var list = uc.querySelectorAll('h2, h3, h4');
+      for (var k = 0; k < list.length; k++) {
+        var h = list[k];
+        var lvl = parseInt(h.tagName.charAt(1), 10);
+        var n;
+        if (lvl === 2) { c2++; c3 = 0; c4 = 0; n = base + '.' + c2; }
+        else if (lvl === 3) {
+          if (!c2) continue;
+          c3++; c4 = 0; n = base + '.' + c2 + '.' + c3;
+        } else {
+          if (!c2 || !c3) continue;
+          c4++; n = base + '.' + c2 + '.' + c3 + '.' + c4;
+        }
+        h.setAttribute('data-num', n);
+      }
     }
 
     // --- Move controls -----------------------------------------------------

@@ -1,0 +1,58 @@
+[
+  {
+    "archivo": "archivo-latin.woff2",
+    "familia": "Archivo",
+    "familiaCss": "Archivo",
+    "pesos": [600, 700],
+    "bytes": 34928,
+    "subconjunto": "latin",
+    "proposito": "Titulos y encabezados (font-display)",
+    "autor": "Omnibus-Type",
+    "copyright": "Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)",
+    "licencia": "SIL Open Font License 1.1",
+    "licenciaArchivo": "OFL.txt",
+    "origen": "https://fonts.google.com/specimen/Archivo"
+  },
+  {
+    "archivo": "ibm-plex-sans-latin.woff2",
+    "familia": "IBM Plex Sans",
+    "familiaCss": "Plex Sans",
+    "pesos": [400, 600],
+    "bytes": 45712,
+    "subconjunto": "latin",
+    "proposito": "Cuerpo de texto y interfaz (font)",
+    "autor": "IBM",
+    "copyright": "Copyright 2017 IBM Corp. with Reserved Font Name \"Plex\"",
+    "licencia": "SIL Open Font License 1.1",
+    "licenciaArchivo": "OFL.txt",
+    "origen": "https://fonts.google.com/specimen/IBM+Plex+Sans"
+  },
+  {
+    "archivo": "ibm-plex-mono-400-latin.woff2",
+    "familia": "IBM Plex Mono",
+    "familiaCss": "Plex Mono",
+    "pesos": [400],
+    "bytes": 14708,
+    "subconjunto": "latin",
+    "proposito": "Codigo en linea y bloques (font-mono)",
+    "autor": "IBM",
+    "copyright": "Copyright 2017 IBM Corp. with Reserved Font Name \"Plex\"",
+    "licencia": "SIL Open Font License 1.1",
+    "licenciaArchivo": "OFL.txt",
+    "origen": "https://fonts.google.com/specimen/IBM+Plex+Mono"
+  },
+  {
+    "archivo": "ibm-plex-mono-500-latin.woff2",
+    "familia": "IBM Plex Mono",
+    "familiaCss": "Plex Mono",
+    "pesos": [500],
+    "bytes": 14888,
+    "subconjunto": "latin",
+    "proposito": "Numeracion de la canaleta, etiquetas y codigo destacado",
+    "autor": "IBM",
+    "copyright": "Copyright 2017 IBM Corp. with Reserved Font Name \"Plex\"",
+    "licencia": "SIL Open Font License 1.1",
+    "licenciaArchivo": "OFL.txt",
+    "origen": "https://fonts.google.com/specimen/IBM+Plex+Mono"
+  }
+]
