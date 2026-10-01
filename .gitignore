@@ -1,0 +1,7 @@
+# Archivo de trabajo local de la presentación: no publicar
+requistos.html
+
+# Copias de seguridad y temporales
+*.bak
+*.tmp
+*~
