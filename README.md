@@ -63,7 +63,7 @@ Cada archivo `.html` es una wiki independiente y **autocontenida** (HTML + CSS +
 ## Uso
 
 ### Ver la presentación
-Abre `requistos.html` (o `index.html`) en el navegador.
+Abre `index.html` en el navegador.
 
 ### Editar
 1. Pulsa **Edit** en la página que quieras modificar.
