@@ -24,7 +24,7 @@ El proyecto incluye una **extensión propia** (`presentation-menu.js`) que añad
 | `feather-search.js` | Barra de búsqueda de páginas en el menú. |
 | `data-import-export.js` | Importar páginas y exportar a páginas, JSON crudo o HTML estático (desde *Wiki Settings*). |
 | `suneditor-replacement.js` | Editor visual avanzado (tipografías, tamaños, colores, tablas, enlaces, code view). **Parcheado** (ver notas). |
-| `simple-navigation.js` | Botones *Anterior / Siguiente* al pie de cada página (se carga desde feather.wiki). |
+| `simple-navigation.js` | Botones *Anterior / Siguiente* al pie de cada página (autoalojado). |
 
 > Descargadas pero **no activadas**: `toggle-menu.js` (duplica la función 5 y choca con ella) y `auto-save.js` (solo funciona con guardado en servidor; en local avisa "Cannot autosave").
 
@@ -34,17 +34,20 @@ El proyecto incluye una **extensión propia** (`presentation-menu.js`) que añad
 
 ```
 Feather-Wiki-Presentation/
-├─ index.html                     # Wiki de documentación/referencia (44 páginas)
-├─ requistos.html                 # Presentación: "Fundamentos de la Ingeniería de Requisitos" (12 páginas)
+├─ index.html                     # Wiki (46 páginas)
 ├─ README.md
 └─ extensions/
    └─ v1.9.x/
       ├─ presentation-menu.js     # Extensión propia
       ├─ feather-search.js
       ├─ data-import-export.js
-      ├─ suneditor-replacement.js # Parcheada
+      ├─ suneditor-replacement.js # Parcheada (carga SunEditor local)
+      ├─ simple-navigation.js     # Autoalojada
       ├─ toggle-menu.js           # Descargada (no activa)
-      └─ auto-save.js             # Descargada (no activa)
+      ├─ auto-save.js             # Descargada (no activa)
+      └─ suneditor/
+         ├─ suneditor.min.js      # SunEditor 2.47.12 (autoalojado)
+         └─ suneditor.min.css
 ```
 
 Cada archivo `.html` es una wiki independiente y **autocontenida** (HTML + CSS + JS + datos). La carpeta `extensions/` debe permanecer **junto** a los archivos `.html`.
@@ -54,16 +57,25 @@ Cada archivo `.html` es una wiki independiente y **autocontenida** (HTML + CSS +
 ## Requisitos
 
 - Un navegador moderno con soporte de **ECMAScript 2015 (ES6)** (Chrome/Edge 86+, Firefox 88+, Safari 13+).
-- **Conexión a internet** para:
-  - **SunEditor** (se carga desde el CDN de jsDelivr). Sin conexión, el editor cae automáticamente al editor visual por defecto.
-  - **simple-navigation.js** (se carga desde `feather.wiki`). Sin conexión no aparecerán los botones Anterior/Siguiente.
+- **Sin conexión a internet.** Todas las dependencias están **autoalojadas** en la carpeta `extensions/`. La app funciona 100 % offline.
+
+### Todo autoalojado (offline)
+| Dependencia | Ubicación local |
+|---|---|
+| SunEditor (JS) | `extensions/v1.9.x/suneditor/suneditor.min.js` |
+| SunEditor (CSS) | `extensions/v1.9.x/suneditor/suneditor.min.css` |
+| Navegación anterior/siguiente | `extensions/v1.9.x/simple-navigation.js` |
+
+> El feed de "Updates" que se cargaba desde `floss.social` fue **eliminado** (era la única llamada de red restante).
 
 ---
 
 ## Uso
 
 ### Ver la presentación
-Abre `requistos.html` (o `index.html`) en el navegador.
+Abre `index.html` en el navegador (no necesita internet ni servidor: también funciona con doble clic).
+
+> Se recomienda mantener el `index.html` **junto a la carpeta `extensions/`**, porque las extensiones y SunEditor se cargan desde ahí.
 
 ### Editar
 1. Pulsa **Edit** en la página que quieras modificar.
@@ -116,12 +128,20 @@ const FWPM = {
 
 - **Zoom y ancho del menú** se guardan en el navegador (`localStorage`), por equipo; no viajan dentro del archivo de la wiki.
 - **SunEditor** se parcheó localmente porque la versión publicada estaba rota:
-  - cargaba `suneditor@latest` (ya es 3.x, incompatible) → se fijó a **2.47.12**;
+  - cargaba `suneditor@latest` (ya es 3.x, incompatible) → se fijó a **2.47.12** (autoalojada);
   - su selector de guarda era incorrecto y **creaba el editor repetidamente** → corregido;
   - usaba `state.edits.useMd`, que no existe en Feather Wiki 1.9.x → corregido;
-  - se añadió una **salvaguarda offline** (si el CDN no carga, se usa el editor por defecto).
+  - ahora carga desde `extensions/v1.9.x/suneditor/` (antes lo hacía desde el CDN de jsDelivr).
 - **`toggle-menu.js` y `auto-save.js`** están descargadas pero no activadas: la primera duplica/choca con la función de ocultar menú; la segunda solo tiene sentido con guardado en servidor (*nest*).
 - Los archivos pueden pesar varios MB si contienen imágenes (se guardan incrustadas en base64).
+- **Totalmente offline**: verificado bloqueando el acceso a internet; no se produce ninguna petición externa.
+
+### Seguridad
+- El antiguo Custom JS incluía un **token de acceso de Mastodon** incrustado y hacía `fetch` a `floss.social`. Fue **eliminado** del archivo.
+- Si ese token llegó a publicarse (por ejemplo en el historial de Git), **revócalo** en floss.social (Preferencias → Desarrollo → Aplicaciones).
+
+### Nota para quien edite `index.html` a mano
+El archivo contiene **todos los datos de la wiki incrustados** en un bloque `<script id="p" type="application/json">`. Editarlo manualmente es delicado: **haz una copia de seguridad antes** y verifica que el JSON siga siendo válido. Lo más seguro es editar desde la propia app (botón **Edit**) y guardar con **Save Wiki**.
 
 ---
 

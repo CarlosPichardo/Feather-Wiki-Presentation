@@ -11,13 +11,13 @@ FW.ready(() => {
 
 	const css = document.createElement('link');
 	css.rel="stylesheet";
-	css.href="https://cdn.jsdelivr.net/npm/suneditor@2.47.12/dist/css/suneditor.min.css";
+	css.href="./extensions/v1.9.x/suneditor/suneditor.min.css";
 	document.head.appendChild(css);
 
 	const script = document.createElement('script');
 	script.onload = () => { emitter.emit(RENDER) }
 	script.type="text/javascript";
-	script.src="https://cdn.jsdelivr.net/npm/suneditor@2.47.12/dist/suneditor.min.js";
+	script.src="./extensions/v1.9.x/suneditor/suneditor.min.js";
 	document.head.appendChild(script);
 
 	emitter.on(RENDER, () => {
