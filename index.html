@@ -285,6 +285,71 @@ main > section > footer a{color:var(--link)}
 .ed-sel{background:var(--sb-bg);border-color:var(--rule)}
 .ed-uc{max-width:none}
 
+/* ---------- 12b. Barra de acciones del editor ----------
+   Feather Wiki maqueta el <footer class=r> del formulario de edición como
+   `display:table` (regla @media min-width:50rem). La celda de las acciones
+   queda entonces empujada por la anchura mínima del <select> "Parent", la
+   tabla se desborda de la hoja y los botones Save / Cancel / Delete caen
+   fuera del papel: al estrechar la ventana o al aplicar zoom de página se
+   salen del área visible y desaparecen.
+   Se reconstruye como flex envolvente y la barra de acciones ocupa su propia
+   línea, en horizontal, debajo del módulo de edición.                       */
+form > footer.r{
+  display:flex !important;
+  flex-wrap:wrap;
+  gap:1rem 1.25rem;
+  align-items:flex-end;
+  width:100%;
+}
+form > footer.r > .c{
+  display:block !important;
+  width:auto !important;
+  min-width:0;
+  flex:1 1 12rem;
+}
+form > footer.r > .c > *{min-width:0}
+form > footer.r select,
+form > footer.r input:not([type=checkbox]){
+  width:100%;max-width:100%;
+}
+/* fila de acciones: una sola línea, siempre dentro de la hoja */
+form > footer.r > .c.tr{
+  flex:1 0 100%;
+  display:flex !important;
+  flex-flow:row wrap;
+  gap:.5rem .75rem;
+  justify-content:flex-end;
+  align-items:center;
+  text-align:right;
+  padding-top:.9rem;
+  border-top:1px solid var(--rule);
+}
+form > footer.r > .c.tr > *{margin:0 !important}
+form > footer.r > .c.tr button{white-space:nowrap}
+
+/* Fila de cabecera (título + slug): misma conversión a flex envolvente.
+   Como tabla se desborda en cuanto la hoja se estrecha (zoom alto o ventana
+   estrecha) y el botón "Slugify Title" se sale del papel.                 */
+form > header > .r{
+  display:flex !important;
+  flex-wrap:wrap;
+  gap:1rem 1.25rem;
+  width:100%;
+}
+form > header > .r > .c{
+  display:block !important;
+  width:auto !important;
+  min-width:0;
+  flex:1 1 14rem;
+}
+form > header > .r > .c > input{width:100%;max-width:100%}
+
+/* suneditor fija un ancho absoluto en línea al abrirse. Ese valor deja de
+   ser válido en cuanto cambia el zoom o el tamaño de la ventana y el módulo
+   de edición se sale de la hoja: se fuerza a ocupar el ancho disponible.  */
+form .sun-editor{width:100% !important;max-width:100%}
+form .sun-editor .se-toolbar{max-width:100%}
+
 /* ---------- 13. Avisos ---------- */
 .noti{
   background:#fff;border:1px solid var(--rule);

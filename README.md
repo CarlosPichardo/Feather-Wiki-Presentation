@@ -103,9 +103,22 @@ La idea es una **hoja impresa sobre un escritorio de taller**: fondo de cromo gr
 | Mono | **IBM Plex Mono** 400/500 para código, metadatos y la numeración de la canaleta |
 | Medida | Columna de lectura de **600 px** (~75 caracteres por línea); la hoja mide 800 px y queda centrada respecto al texto |
 | Cabecera | Título apilado sobre una sola línea de metadatos (la tabla de dos columnas de Feather Wiki se deshace con `!important`) |
+| Formulario de edición | Cabecera, campos y **barra de acciones en flex envolvente**: `Save · Cancel · Delete` ocupan su propia línea, en horizontal, debajo del módulo de edición |
 | Numeración | `main > section[data-num]` → canaleta de `4.5rem` con filete en `--rail`; los números se alinean a la derecha contra el filete |
 | Página activa | `.fwpm-active` en el menú (enlace azul + subrayado + fondo tenue) |
 | Ancho | En modo presentación (menú oculto) la hoja se expande a todo el ancho |
+
+### Editor: barra de acciones siempre visible
+
+Feather Wiki maqueta el pie del formulario de edición como `display:table` (`@media (min-width:50rem)`). Esa tabla se estiraba por la anchura mínima del desplegable **Parent**, se desbordaba de la hoja y empujaba los botones fuera del papel: al estrechar la ventana o al aplicar el zoom de página (`Ctrl` + rueda) desaparecían de la pantalla.
+
+El tema lo reconstruye y:
+
+- **Cabecera (título + slug), campos y acciones** pasan a `display:flex` envolvente, así que nunca desbordan la hoja.
+- **`Save · Cancel · Delete`** comparten una sola línea con un filete superior, justo debajo del módulo de edición.
+- **SunEditor** fija un ancho absoluto en línea al abrirse; se fuerza a `width:100%`, de modo que el módulo se adapta si cambias el zoom o redimensionas la ventana (las barras de herramientas envuelven en varias filas en vez de salirse).
+
+Comprobado con 22 combinaciones (480–1920 px de ancho × zoom 75–200 %, editor plegado y desplegado, y redimensionado tras abrir el editor): los tres botones quedan dentro de la hoja, en la misma línea y clicables en todos los casos.
 
 ### Cómo cambiar el tema
 
@@ -182,7 +195,7 @@ const FWPM = {
   - usaba `state.edits.useMd`, que no existe en Feather Wiki 1.9.x → corregido;
   - ahora carga desde `extensions/v1.9.x/suneditor/` (antes lo hacía desde el CDN de jsDelivr).
 - **`toggle-menu.js` y `auto-save.js`** están descargadas pero no activadas: la primera duplica/choca con la función de ocultar menú; la segunda solo tiene sentido con guardado en servidor (*nest*).
-- Los archivos pueden pesar varios MB si contienen imágenes (se guardan incrustadas en base64). Este `index.html` pesa ~690 KB: los datos de las 46 páginas (~300 KB), el tema (~13 KB) y las 14 fotos incrustadas en base64 (~390 KB).
+- Los archivos pueden pesar varios MB si contienen imágenes (se guardan incrustadas en base64). Este `index.html` pesa ~700 KB: el JSON con las 46 páginas (~620 KB, de los que ~390 KB son las 14 fotos incrustadas en base64) y el tema (~15 KB).
 - **Totalmente offline**: verificado recorriendo las **47 páginas del menú** en Chrome y registrando todas las peticiones de red — **0 peticiones externas**, 0 fallos de carga y 0 errores de JS. Lo mismo se repitió abriendo el archivo con `file://` (doble clic): las 4 fuentes WOFF2 cargan y las imágenes se muestran.
 
 ### Verificación offline (cómo se comprobó)
