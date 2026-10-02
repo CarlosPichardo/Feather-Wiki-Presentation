@@ -15,7 +15,7 @@ El proyecto incluye una **extensión propia** (`presentation-menu.js`) que añad
 4. **Editor con tamaños de fuente.** Botones `H1`–`H6` en el editor visual y botón de lista numerada claro (`1.` junto a `•`).
 5. **Ocultar/mostrar el menú.** Botón `«` para ocultarlo; al ocultarse aparece una franja sensible en el borde izquierdo y un botón `☰` para traerlo de vuelta como panel superpuesto; `»` lo fija de nuevo.
 6. **Zoom solo de la página.** `Ctrl/Cmd + rueda` sobre el contenido agranda/achica únicamente la página (el menú mantiene su tamaño). `Ctrl/Cmd + 0` reinicia.
-7. **Ancho del menú ajustable.** Arrastrando el divisor del borde derecho del menú.
+7. **Ancho del menú ajustable.** Arrastrando el divisor del borde derecho del menú (por defecto, como máximo 320 px para dejar el resto al documento).
 8. **Corrector ortográfico.** Fuerza el corrector en el editor y permite fijar el idioma (por defecto, el del documento).
 9. **Página activa resaltada.** El ítem de la página actual se marca con la clase `fwpm-active` (enlace + fondo), de modo que siga siendo visible al navegar.
 10. **Numeración de encabezados.** Cada `h2`–`h6` del contenido recibe su número de jerarquía (`4.5`, `4.5.1`, `4.5.1.1`…) como atributo `data-num`, que el CSS dibuja en la canaleta de la izquierda. Desactivable con `numberHeadings: false`.
@@ -91,7 +91,7 @@ Las fuentes se sirven con `@font-face` desde `./extensions/fonts/` y **cargan ig
 
 El aspecto visual está aplicado en **`index.html` → Wiki Settings → Custom CSS** (`<style id="c">`). No hay CSS externo: el tema viaja dentro del propio archivo.
 
-La idea es una **hoja impresa sobre un escritorio de taller**: fondo de cromo gris, documento blanco con borde derecho, y una **canaleta de numeración** con un filete vertical que conecta cada encabezado con su número.
+La idea es un **cuaderno de taller**: fondo de cromo gris en el menú lateral y una **hoja blanca que ocupa todo lo que deja el menú**, con una **canaleta de numeración** y un filete vertical que conecta cada encabezado con su número.
 
 | Elemento | Decisión |
 |---|---|
@@ -101,12 +101,31 @@ La idea es una **hoja impresa sobre un escritorio de taller**: fondo de cromo gr
 | Display | **Archivo** 600/700 para títulos y encabezados |
 | Cuerpo | **IBM Plex Sans** 400/600 |
 | Mono | **IBM Plex Mono** 400/500 para código, metadatos y la numeración de la canaleta |
-| Medida | Columna de lectura de **600 px** (~75 caracteres por línea); la hoja mide 800 px y queda centrada respecto al texto |
+| Medida | **Sin tope**: la columna de lectura crece con la hoja y aprovecha el ancho disponible (tablas, imágenes, código, formulario y editor a todo ancho) |
 | Cabecera | Título apilado sobre una sola línea de metadatos (la tabla de dos columnas de Feather Wiki se deshace con `!important`) |
 | Formulario de edición | Cabecera, campos y **barra de acciones en flex envolvente**: `Save · Cancel · Delete` ocupan su propia línea, en horizontal, debajo del módulo de edición |
 | Numeración | `main > section[data-num]` → canaleta de `4.5rem` con filete en `--rail`; los números se alinean a la derecha contra el filete |
 | Página activa | `.fwpm-active` en el menú (enlace azul + subrayado + fondo tenue) |
-| Ancho | En modo presentación (menú oculto) la hoja se expande a todo el ancho |
+| Ancho | La hoja ocupa **todo el ancho disponible** en cualquier tamaño; solo por encima de 2200 px se recupera una medida de lectura de 1600 px en la prosa |
+
+### Aprovechamiento del ancho de pantalla
+
+La hoja no está limitada: el menú ocupa lo justo (por defecto `clamp(200px, 20%, 320px)`) y **el documento usa todo lo que queda hasta el borde derecho**.
+
+| Antes | Ahora |
+|---|---|
+| Hoja fija en `max-width: 800 px` | `max-width: none` → llena el área del documento |
+| Columna de lectura en `600 px` | `max-width: none` → crece con la hoja |
+| Formulario y ajustes | `form`, `.mw` (página de ajustes) y `.ed` limitados a `1000 px` | `max-width: none` → a todo ancho |
+| Franja de cromo gris vacía a la derecha | `hueco = 0 px` en todos los tamaños |
+
+Detalles:
+
+- **Menú**: `clamp(200px, 20%, 320px)` — en pantallas de 1600 px o más deja de crecer y no se lleva espacio del documento. Sigue siendo arrastrable para ajustarlo a mano.
+- **Imágenes, vídeo e iframe**: `max-width: 100%` dentro de la columna, para que un contenido ancho no se salga de la hoja.
+- **Pantallas muy anchas**: a partir de **2200 px** de ventana la prosa vuelve a limitarse a `1600 px` (unos 90 caracteres por línea) para no perder legibilidad; tablas, imágenes y bloques siguen a todo ancho. Para cambiarlo, la regla es `@media (min-width:2200px){ main .uc, main>section>header{max-width:1600px} }`.
+
+Medido con `probe-widths.js` en **16 combinaciones** (480–2560 px: lectura, página de ajustes, imágenes, edición, editor desplegado y zoom ×1,5): `hueco = 0` en todas y ningún elemento desbordado. La página de ajustes pasa de `1000 px` a `1465 px` en una ventana de 1920.
 
 ### Editor: barra de acciones siempre visible
 

@@ -98,7 +98,7 @@
       var style = document.createElement('style');
       style.id = 'fw-presentation-menu';
       style.textContent =
-        ':root{--fwpm-sb-width:20%;--fwpm-page-zoom:1}' +
+        ':root{--fwpm-sb-width:clamp(200px,20%,320px);--fwpm-page-zoom:1}' +
         // Zoom applies to the page content only, so the menu never changes size
         'main>section{zoom:var(--fwpm-page-zoom,1)}' +
         '#fwpm-zoom-badge{position:fixed;right:1rem;bottom:1rem;z-index:70;' +

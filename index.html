@@ -139,7 +139,7 @@ main>section>header{
   color:var(--muted);
   border-bottom:1px solid var(--rule);
   padding-bottom:.7rem;margin-bottom:1.4rem;
-  max-width:600px;
+  max-width:none;
 }
 main>section>header .r.ns{display:block !important}
 main>section>header h1.c{
@@ -197,16 +197,24 @@ main>section>header .c.tr > button{
 /* La posición ya se ve en el margen: el duplicado solo ensucia la cabecera */
 main>section[data-num] #fwpm-move .fwpm-pos{display:none}
 
-/* ---------- 8. La hoja: medida de lectura y borde derecho ---------- */
+/* ---------- 8. La hoja: todo el ancho disponible ----------
+   Antes la hoja estaba limitada a 800 px y la columna de lectura a 600 px,
+   lo que dejaba una franja grande de cromo gris vacía a la derecha. Ahora la
+   hoja ocupa todo lo que deja el menú y la columna crece con ella; tablas,
+   imágenes, código y el formulario aprovechan el ancho completo.          */
 main>section{
-  max-width:800px;
+  max-width:none;
   background:var(--bg);
-  border-right:1px solid var(--rule);
 }
-/* En modo presentación (menú oculto) la hoja ocupa toda la pantalla */
-html.fwpm-hidden main>section{max-width:none;border-right:0}
-main .uc{max-width:600px;line-height:1.62}
+/* En modo presentación (menú superpuesto) la hoja ocupa toda la pantalla */
+html.fwpm-hidden main>section{max-width:none}
+main .uc{max-width:none;line-height:1.62}
 main .uc > :first-child{margin-top:0}
+/* Solo en monitores muy anchos (>2200 px) se recupera una medida de lectura
+   cómoda para la prosa; tablas, imágenes y bloques siguen a todo ancho.   */
+@media (min-width:2200px){
+  main .uc,main>section>header{max-width:1600px}
+}
 
 /* ---------- 9. CANALETAS Y FILETE DE TRAZABILIDAD ---------- */
 main>section{padding-left:calc(1.5rem + var(--gutter))}
@@ -268,7 +276,8 @@ main .uc hr{border:0;border-top:1px solid var(--rule);margin:1.6rem 0}
 main .uc table{border-collapse:collapse;width:100%;font-size:.92rem}
 main .uc th,main .uc td{border:1px solid var(--rule);padding:.4rem .6rem;text-align:left}
 main .uc th{background:var(--tint);font-weight:600}
-main .uc img{border-radius:3px}
+main .uc img{border-radius:3px;max-width:100%;height:auto}
+main .uc :is(video,iframe){max-width:100%}
 main .uc a[href^="http"]{word-break:break-word}
 
 /* ---------- 11. Navegación anterior/siguiente y pie ---------- */
@@ -279,6 +288,19 @@ main > section > footer a{color:var(--link)}
 .ed,textarea,.ed-content,#g{
   background:#fff;border-color:var(--rule);
 }
+/* El límite base de 1000 px deja de tener sentido: la hoja ya no tiene tope,
+   así que el formulario, la página de ajustes (.mw) y el editor aprovechan
+   todo el ancho. A los controles con width:100% les sobra el cap también. */
+form,.mw,.ed,.ed-content{max-width:none}
+form :is(input,select,textarea){max-width:none}
+/* Los controles de ancho fijo (.w1, .w34, .w12, .w14) y el relleno lateral de
+   `main>*` recortaban el ancho útil del documento: se recuperan aquí. */
+.w1{width:100%}
+.w34{width:75%}
+.w12{width:50%}
+.w13{width:33.333%}
+.w14{width:25%}
+main>*{padding-left:1.5rem;padding-right:1.5rem}
 .ed-bar{border-bottom-color:var(--rule)}
 .ed-btn{color:var(--color)}
 .ed-btn:hover{background:var(--tint);opacity:1}
@@ -298,7 +320,7 @@ form > footer.r{
   display:flex !important;
   flex-wrap:wrap;
   gap:1rem 1.25rem;
-  align-items:flex-end;
+  align-items:flex-start;
   width:100%;
 }
 form > footer.r > .c{
@@ -306,6 +328,9 @@ form > footer.r > .c{
   width:auto !important;
   min-width:0;
   flex:1 1 12rem;
+  /* *+* da margen superior a la 2ª celda; como celda de tabla se ignoraba,
+     como flex item desalineaba las etiquetas de la fila. */
+  margin:0;
 }
 form > footer.r > .c > *{min-width:0}
 form > footer.r select,
@@ -341,6 +366,7 @@ form > header > .r > .c{
   width:auto !important;
   min-width:0;
   flex:1 1 14rem;
+  margin:0;
 }
 form > header > .r > .c > input{width:100%;max-width:100%}
 
